@@ -1,0 +1,256 @@
+{
+  "info": {
+    "name": "SlotMind Complete",
+    "description": "Restart the default application to restore seed data. Do not book SLT-005 before the doctor-offline demo because it is the sole GENERAL replacement slot. Manual suggestion captures suggestionId automatically.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "http://localhost:8080"
+    },
+    {
+      "key": "suggestionId",
+      "value": "COPY_ACTUAL_SUGGESTION_ID"
+    }
+  ],
+  "item": [
+    {
+      "name": "Doctors",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": "{{baseUrl}}/providers"
+      }
+    },
+    {
+      "name": "Slots",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": "{{baseUrl}}/slots"
+      }
+    },
+    {
+      "name": "All appointments",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": "{{baseUrl}}/appointments"
+      }
+    },
+    {
+      "name": "Pending appointments",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": "{{baseUrl}}/appointments?status=RESCHEDULE_PENDING"
+      }
+    },
+    {
+      "name": "Book appointment",
+      "request": {
+        "method": "POST",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": "{{baseUrl}}/appointments",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"patientName\": \"Ajay Kumar Dey\",\n  \"appointmentType\": \"ROUTINE\",\n  \"providerId\": \"PRV-004\",\n  \"slotId\": \"SLT-005\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        }
+      }
+    },
+    {
+      "name": "Doctor offline (automatic trigger)",
+      "request": {
+        "method": "PATCH",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": "{{baseUrl}}/providers/PRV-001/status",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"status\": \"OFFLINE\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        }
+      }
+    },
+    {
+      "name": "Cancel booked slot (automatic trigger)",
+      "request": {
+        "method": "PATCH",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": "{{baseUrl}}/slots/SLT-001/status",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"status\": \"CANCELLED\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        }
+      }
+    },
+    {
+      "name": "Manual suggestion",
+      "request": {
+        "method": "POST",
+        "header": [],
+        "url": "{{baseUrl}}/appointments/APT-001/suggest"
+      },
+      "event": [
+        {
+          "listen": "test",
+          "script": {
+            "type": "text/javascript",
+            "exec": [
+              "if (pm.response.code === 200) { pm.collectionVariables.set(\"suggestionId\", pm.response.json().id); }"
+            ]
+          }
+        }
+      ]
+    },
+    {
+      "name": "Suggestions",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": "{{baseUrl}}/suggestions"
+      }
+    },
+    {
+      "name": "Accept suggestion",
+      "request": {
+        "method": "PATCH",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": "{{baseUrl}}/suggestions/{{suggestionId}}",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"status\": \"ACCEPTED\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        }
+      }
+    },
+    {
+      "name": "Reject suggestion",
+      "request": {
+        "method": "PATCH",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": "{{baseUrl}}/suggestions/{{suggestionId}}",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"status\": \"REJECTED\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        }
+      }
+    },
+    {
+      "name": "Background jobs",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": "{{baseUrl}}/reschedule-jobs"
+      }
+    },
+    {
+      "name": "Strategy registry",
+      "request": {
+        "method": "GET",
+        "header": [],
+        "url": "{{baseUrl}}/scheduling/strategy"
+      }
+    },
+    {
+      "name": "Switch to rule strategy",
+      "request": {
+        "method": "PATCH",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": "{{baseUrl}}/scheduling/strategy",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"strategy\": \"rule\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        }
+      }
+    },
+    {
+      "name": "Switch to AI strategy",
+      "request": {
+        "method": "PATCH",
+        "header": [
+          {
+            "key": "Content-Type",
+            "value": "application/json"
+          }
+        ],
+        "url": "{{baseUrl}}/scheduling/strategy",
+        "body": {
+          "mode": "raw",
+          "raw": "{\n  \"strategy\": \"ai\"\n}",
+          "options": {
+            "raw": {
+              "language": "json"
+            }
+          }
+        }
+      }
+    },
+    {
+      "name": "Complete appointment",
+      "request": {
+        "method": "PATCH",
+        "header": [],
+        "url": "{{baseUrl}}/appointments/APT-001/complete"
+      }
+    }
+  ]
+}

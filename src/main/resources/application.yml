@@ -1,0 +1,30 @@
+server:
+  port: 8080
+spring:
+  application:
+    name: slotmind
+  datasource:
+    url: ${DB_URL:jdbc:h2:mem:slotmind;DB_CLOSE_DELAY=-1}
+    username: ${DB_USERNAME:sa}
+    password: ${DB_PASSWORD:}
+  jpa:
+    hibernate:
+      ddl-auto: ${DDL_AUTO:create-drop}
+    open-in-view: false
+  h2:
+    console:
+      enabled: true
+      path: /h2-console
+
+llm:
+  provider: openai-compatible
+  url: https://api.groq.com/openai/v1/chat/completions
+  model: openai/gpt-oss-120b
+  api-key: ${GROQ_API_KEY}
+  timeout-seconds: 30
+
+scheduling:
+  strategy: ai
+worker:
+  enabled: true
+  poll-ms: 1500
